@@ -92,7 +92,7 @@ def read_carf(fname):
 
     return mol, atids, resids
 
-def print_mol2f(mol, atids, resname2, attyp_dict):
+def print_mol2f(mol, atids, outfile, resname2, attyp_dict):
 
     #iddict1: atom id
     #mol: atname, crd
@@ -102,9 +102,9 @@ def print_mol2f(mol, atids, resname2, attyp_dict):
 
     blist = get_blist(mol, atids)
 
-    mol2f = open(resname2 + '.mol2', 'w')
+    mol2f = open(outfile, 'w')
 
-    print('***Generating the ' + resname2 + '.mol2 file...')
+    print('***Generating the ' + outfile + ' file...')
 
     ##1. molecule information
     print("@<TRIPOS>MOLECULE", file=mol2f)
