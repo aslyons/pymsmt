@@ -14,6 +14,7 @@ def read_carf(fname):
 
     end = 0
     pbc = 0
+    pbc_size = ' '
     #Detect the line numbers of each part information
     fp = open(fname, 'r')
     lnum = 1
@@ -23,6 +24,10 @@ def read_carf(fname):
         if pbc == 1:
             if ("PBC " in line):
                 atbgin = lnum + 1
+                pbc_size = line.lstrip("PBC")
+                pbc_size = pbc_size.strip('\n')
+                pbc_size = pbc_size.replace('(', '')
+                pbc_size = pbc_size.replace(')', '')
         else:
             if ("!DATE" in line):
                 atbgin = lnum + 1
@@ -40,7 +45,7 @@ def read_carf(fname):
     resnamedict = {}
     conterdict = {}
 
-    print(atbgin, atend)
+    #print(atbgin, atend)
 
     atid = 0
     for i in range(atbgin, atend):
@@ -90,7 +95,7 @@ def read_carf(fname):
 
     mol = Molecule(Atoms, Residues)
 
-    return mol, atids, resids
+    return mol, atids, resids, pbc_size
 
 def print_mol2f(mol, atids, outfile, resname2, attyp_dict):
 
@@ -100,11 +105,11 @@ def print_mol2f(mol, atids, outfile, resname2, attyp_dict):
     #stdict: atom charge
     #blist_each: bond information
 
+    print('***Generating the ' + outfile + ' file...')
+
     blist = get_blist(mol, atids)
 
     mol2f = open(outfile, 'w')
-
-    print('***Generating the ' + outfile + ' file...')
 
     ##1. molecule information
     print("@<TRIPOS>MOLECULE", file=mol2f)
@@ -143,4 +148,31 @@ def print_mol2f(mol, atids, outfile, resname2, attyp_dict):
     print('     1', resname2, '        1 TEMP' + \
                     '              0 ****  ****    0 ROOT', file=mol2f)
     mol2f.close()
+
+def print_pdbf(mol, atids, fname, pbc_size):
+
+    print('***Generating the ' + fname + ' file...')
+
+    wf = open(fname, 'w')
+    print('REMARK, BUILD BY MCPB.PY', file=wf)
+
+    if pbc_size != ' ':
+        print('CRYST1' + pbc_size, file=wf)
+
+    for i in atids:
+        atm = mol.atoms[i]
+        gtype = atm.gtype
+        atid = atm.atid
+        if len(atm.atname) == 3:
+            atname = atm.atname
+        else:
+            atname = atm.atname.center(4)
+        crd = atm.crd
+        resid = atm.resid
+        resname = atm.resname
+        print("%-6s%5d %4s %3s %1s%4d    %8.3f%8.3f%8.3f%6.2f%6.2f" \
+                 %(gtype, atid, atname, resname, 'A', resid, crd[0], crd[1], crd[2], 1.00, 0.00), file=wf)
+    print('END', file=wf)
+    wf.close()
+
 

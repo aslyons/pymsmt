@@ -12,7 +12,7 @@ modules = ['pymsmtexp', 'title']
 # Scripts
 scripts = ['msmttools/MCPB.py', 'msmttools/OptC4.py', 'msmttools/PdbSearcher.py',
            'msmttools/espgen.py', 'msmttools/CartHess2FC.py', 'msmttools/IPMach.py',
-           'msmttools/car2mol2.py']
+           'msmttools/car_to_files.py']
 
 if __name__ == '__main__':
 
